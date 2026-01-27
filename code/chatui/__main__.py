@@ -22,8 +22,6 @@ import argparse
 import os
 import sys
 
-import uvicorn
-
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments for the program.
@@ -112,7 +110,7 @@ if __name__ == "__main__":
     os.environ["APP_VERBOSITY"] = f"{args.verbose - args.quiet}"
     os.environ["APP_CONFIG_FILE"] = args.config
 
-    from chatui import api, chat_client, configuration, pages
+    from chatui import chat_client, configuration, pages
 
     # load config
     config_file = os.environ.get("APP_CONFIG_FILE", "/dev/null")
@@ -123,9 +121,7 @@ if __name__ == "__main__":
     # connect to other services
     api_url = f"{config.server_url}:{config.server_port}"
     print(api_url)
-    client = chat_client.ChatClient(
-       api_url, config.model_name
-    )
+    client = chat_client.ChatClient(api_url, config.model_name)
     proxy_prefix = os.environ.get("PROXY_PREFIX")
     blocks = pages.converse.build_page(client)
     blocks.queue(max_size=10)

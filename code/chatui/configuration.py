@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """The definition of the application configuration."""
+
 from chatui.configuration_wizard import ConfigWizard, configclass, configfield
 
 

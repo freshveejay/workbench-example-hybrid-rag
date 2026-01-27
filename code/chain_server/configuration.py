@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """The definition of the application configuration."""
+
 from chain_server.configuration_wizard import ConfigWizard, configclass, configfield
 
 
@@ -62,7 +63,10 @@ class AppConfig(ConfigWizard):
     """
 
     milvus: MilvusConfig = configfield(
-        "milvus", env=False, default="http://127.0.0.1:19530", help_txt="The configuration of the Milvus connection."
+        "milvus",
+        env=False,
+        default="http://127.0.0.1:19530",
+        help_txt="The configuration of the Milvus connection.",
     )
     # triton: TritonConfig = configfield(
     #     "triton",

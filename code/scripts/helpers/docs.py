@@ -19,16 +19,18 @@ import mimetypes
 
 import hashlib
 import json
-import os
+
 
 # Function to check if running in a Jupyter notebook
 def in_jupyter():
     try:
         from IPython import get_ipython
-        if 'IPKernelApp' in get_ipython().config:
+
+        if "IPKernelApp" in get_ipython().config:
             return True
     except:
         return False
+
 
 class DocProcessor:
     def __init__(self, docs_dir, mount_docs_dir, upload_url, log=False):
@@ -52,14 +54,16 @@ class DocProcessor:
         """Save the processed file's hash to the disk and release the lock."""
         with open(self.record_file, "w") as file:
             json.dump(self.record, file)
-        
+
         os.remove(self.record_lock_file)
-    
+
     def _load(self):
         """Load the processed file's hash from the if not locked disk."""
         if os.path.exists(self.record_lock_file):
-            raise FileExistsError(f"Cache file is locked. Another process is likely indexing docs. If not, delete {self.record_lock_file}")
-        
+            raise FileExistsError(
+                f"Cache file is locked. Another process is likely indexing docs. If not, delete {self.record_lock_file}"
+            )
+
         with open(self.record_lock_file, "w") as file:
             file.write("LOCKED")
 
@@ -83,34 +87,32 @@ class DocProcessor:
                 if self.log:
                     print(f"{filepath} - processed.")
             except Exception as err:
-                    print(f"{filepath} - failed: {err}")
+                print(f"{filepath} - failed: {err}")
         else:
             if self.log:
                 print(f"Skipping {filepath}, already processed.")
 
     def _upload_document(self, file_path):
-        headers = {
-            'accept': 'application/json'
-        }
+        headers = {"accept": "application/json"}
         mime_type, _ = mimetypes.guess_type(file_path)
-        files = {
-            'file': (file_path, open(file_path, 'rb'), mime_type)
-        }
+        files = {"file": (file_path, open(file_path, "rb"), mime_type)}
         response = requests.post(self.upload_url, headers=headers, files=files)
 
         if response.status_code != 200:
-            raise Exception(f"Document upload failed with status code {response.status_code}: {response.text}")
-        
+            raise Exception(
+                f"Document upload failed with status code {response.status_code}: {response.text}"
+            )
+
         if "File uploaded successfully" not in response.text:
             raise Exception(f"Document upload failed: {response.text}")
-    
+
     def _count_files(self, dir_list):
         file_count = 0
         for directory in dir_list:
             for _, _, files in os.walk(directory):
                 file_count += len(files)
         return file_count
-    
+
     def process(self):
         if in_jupyter():
             from tqdm.notebook import tqdm
@@ -128,10 +130,14 @@ class DocProcessor:
                 for directory in dir_list:
                     for root, _, files in os.walk(directory):
                         for file in files:
-                            if file in [".gitkeep", ".file_cache.json", ".file_cache.lock"]:
+                            if file in [
+                                ".gitkeep",
+                                ".file_cache.json",
+                                ".file_cache.lock",
+                            ]:
                                 pbar.update(1)
                                 continue
-                                
+
                             file_path = os.path.join(root, file)
                             self._process_doc(file_path)
                             pbar.update(1)
@@ -141,5 +147,7 @@ class DocProcessor:
 
 
 if __name__ == "__main__":
-    p = DocProcessor("../data/documents", "/mnt/docs", "http://localhost:8000/uploadDocument", True)
+    p = DocProcessor(
+        "../data/documents", "/mnt/docs", "http://localhost:8000/uploadDocument", True
+    )
     p.process()

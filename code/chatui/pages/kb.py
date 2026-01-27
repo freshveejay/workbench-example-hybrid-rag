@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """This module contains the chatui gui for chat."""
+
 from pathlib import Path
 from typing import List
 

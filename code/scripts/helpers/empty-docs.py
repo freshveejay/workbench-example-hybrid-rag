@@ -15,11 +15,10 @@
 
 import os
 import shutil
-from milvus import default_server
 from pymilvus import connections, utility, Collection
 
 # Get connection to DB
-connections.connect(host='localhost', port=19530)
+connections.connect(host="localhost", port=19530)
 
 # Get collection
 collection = Collection(utility.list_collections()[0])
@@ -39,7 +38,7 @@ print(id_array)
 
 if os.path.exists("/project/data/documents/.file_cache.json"):
     os.remove("/project/data/documents/.file_cache.json")
-    
+
 if os.path.exists("/project/data/documents/.file_cache.lock"):
     os.remove("/project/data/documents/.file_cache.lock")
 

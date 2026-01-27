@@ -15,13 +15,13 @@
 
 from typing import Any, List, Mapping, Optional, Generator
 import os
-import json
 import time
 
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.llms.base import LLM
 from langchain.pydantic_v1 import Field
 import requests
+
 
 class NvcfLLM(LLM):
     endpoint: str = Field(None, alias="endpoint")
@@ -40,8 +40,13 @@ class NvcfLLM(LLM):
             response_json = response.json()
             status = response_json.get("status")
             if status == "fulfilled":
-                content = response_json.get('response', {}).get('choices', [])[0].get('message', {}).get('content', None)
-        
+                content = (
+                    response_json.get("response", {})
+                    .get("choices", [])[0]
+                    .get("message", {})
+                    .get("content", None)
+                )
+
         return content
 
     def _call(
@@ -56,42 +61,44 @@ class NvcfLLM(LLM):
 
         token = os.environ.get("NVIDIA_API_KEY")
         headers = {
-            "Authorization": f"Bearer {token}",  
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
         }
 
         data = {
             "requestBody": {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
+                "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.2,
                 "top_p": 0.7,
                 "max_tokens": 1024,
                 "seed": 42,
-                #"stream": True
+                # "stream": True
             }
         }
 
         response = requests.post(self.endpoint, headers=headers, json=data)
-        
+
         if response.status_code == 200:
             response_json = response.json()
-            content = response_json.get('response', {}).get('choices', [])[0].get('message', {}).get('content', None)
+            content = (
+                response_json.get("response", {})
+                .get("choices", [])[0]
+                .get("message", {})
+                .get("content", None)
+            )
             return content
         elif response.status_code == 202:
             response_json = response.json()
             for _ in range(5):
-                content = self._wait_for_fullfill(response_json.get('id'), headers)
+                content = self._wait_for_fullfill(response_json.get("id"), headers)
                 if content is not None:
                     return content
-                
-                time.sleep(.5)
-            
-            raise Exception(f"Failed to get response in time: {response} - {response.json()}")
+
+                time.sleep(0.5)
+
+            raise Exception(
+                f"Failed to get response in time: {response} - {response.json()}"
+            )
         else:
             raise Exception(f"Failed to get response: {response} - {response.json()}")
 

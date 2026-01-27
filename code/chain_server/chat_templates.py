@@ -95,7 +95,7 @@ MICROSOFT_RAG_TEMPLATE = (
     "Use the following context to answer the question. If you don't know the answer,"
     "just say that you don't know, don't try to make up an answer.\n"
     "Context: {context_str} Question: {query_str} Only return the helpful"
-    " answer below and nothing else. <|end|> \n" 
+    " answer below and nothing else. <|end|> \n"
     "<|assistant|>"
 )
 
@@ -103,5 +103,5 @@ GENERIC_RAG_TEMPLATE = (
     "Use the following context to answer the question. If you don't know the answer,"
     "just say that you don't know, don't try to make up an answer.\n"
     "Context: {context_str} Question: {query_str} Only return the helpful"
-    " answer below and nothing else. \n" 
+    " answer below and nothing else. \n"
 )

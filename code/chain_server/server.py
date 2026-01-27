@@ -14,10 +14,10 @@
 # limitations under the License.
 
 """The definition of the Llama Index chain server."""
+
 import base64
 import os
 import shutil
-import json
 from pathlib import Path
 from typing import Any, Dict, List
 import tempfile
@@ -33,7 +33,9 @@ app = FastAPI()
 # prestage the embedding model
 _ = chains.get_embedding_model()
 # set the global service context for Llama Index
-chains.set_service_context("local", "playground_mistral_7b", "10.123.45.678", 256, 0.7, 1.0, 0.0)
+chains.set_service_context(
+    "local", "playground_mistral_7b", "10.123.45.678", 256, 0.7, 1.0, 0.0
+)
 
 
 class Prompt(BaseModel):
@@ -47,7 +49,7 @@ class Prompt(BaseModel):
     local_model_id: str
     nvcf_model_id: str
     nim_model_ip: str
-    nim_model_port: str 
+    nim_model_port: str
     nim_model_id: str
     temp: float
     top_p: float
@@ -64,9 +66,7 @@ class DocumentSearch(BaseModel):
 
 @app.get("/health")
 async def health() -> JSONResponse:
-      return JSONResponse(
-        content={"status": "OK"}, status_code=200
-    )
+    return JSONResponse(content={"status": "OK"}, status_code=200)
 
 
 @app.post("/uploadDocument")
@@ -92,39 +92,44 @@ async def upload_document(file: UploadFile = File(...)) -> JSONResponse:
         content={"message": "File uploaded successfully"}, status_code=200
     )
 
+
 @app.post("/generate")
 async def generate_answer(prompt: Prompt) -> StreamingResponse:
     """Generate and stream the response to the provided prompt."""
-    
-    if prompt.use_knowledge_base:
-        generator = chains.rag_chain_streaming(prompt.question, 
-                                               prompt.num_tokens, 
-                                               prompt.inference_mode, 
-                                               prompt.local_model_id,
-                                               prompt.nvcf_model_id,
-                                               prompt.nim_model_ip,
-                                               prompt.nim_model_port, 
-                                               prompt.nim_model_id,
-                                               prompt.temp,
-                                               prompt.top_p,
-                                               prompt.freq_pen,
-                                               prompt.pres_pen)
-        return StreamingResponse(generator, media_type="text/event-stream")  
 
-    generator = chains.llm_chain_streaming(prompt.context, 
-                                           prompt.question, 
-                                           prompt.num_tokens, 
-                                           prompt.inference_mode, 
-                                           prompt.local_model_id,
-                                           prompt.nvcf_model_id,
-                                           prompt.nim_model_ip,
-                                           prompt.nim_model_port,
-                                           prompt.nim_model_id,
-                                           prompt.temp,
-                                           prompt.top_p,
-                                           prompt.freq_pen,
-                                           prompt.pres_pen)
-    return StreamingResponse(generator, media_type="text/event-stream")    
+    if prompt.use_knowledge_base:
+        generator = chains.rag_chain_streaming(
+            prompt.question,
+            prompt.num_tokens,
+            prompt.inference_mode,
+            prompt.local_model_id,
+            prompt.nvcf_model_id,
+            prompt.nim_model_ip,
+            prompt.nim_model_port,
+            prompt.nim_model_id,
+            prompt.temp,
+            prompt.top_p,
+            prompt.freq_pen,
+            prompt.pres_pen,
+        )
+        return StreamingResponse(generator, media_type="text/event-stream")
+
+    generator = chains.llm_chain_streaming(
+        prompt.context,
+        prompt.question,
+        prompt.num_tokens,
+        prompt.inference_mode,
+        prompt.local_model_id,
+        prompt.nvcf_model_id,
+        prompt.nim_model_ip,
+        prompt.nim_model_port,
+        prompt.nim_model_id,
+        prompt.temp,
+        prompt.top_p,
+        prompt.freq_pen,
+        prompt.pres_pen,
+    )
+    return StreamingResponse(generator, media_type="text/event-stream")
 
 
 @app.post("/documentSearch")

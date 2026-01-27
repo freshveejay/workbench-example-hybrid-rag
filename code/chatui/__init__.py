@@ -43,7 +43,13 @@ def bootstrap_logging(verbosity: int = 0) -> None:
     log_level = [logging.WARN, logging.INFO, logging.DEBUG][verbosity]
 
     # configure python's logger
-    logging.basicConfig(filename='chatui.log', filemode='w',format=_LOG_FMT, datefmt=_LOG_DATE_FMT, level=log_level)
+    logging.basicConfig(
+        filename="chatui.log",
+        filemode="w",
+        format=_LOG_FMT,
+        datefmt=_LOG_DATE_FMT,
+        level=log_level,
+    )
     # update existing loggers
     _LOGGER.setLevel(logging.DEBUG)
     for logger in [

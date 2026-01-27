@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """The API client for the langchain-esque service."""
+
 import logging
 import mimetypes
 import typing
@@ -55,20 +56,20 @@ class ChatClient:
             )
 
     def predict(
-        self, 
-        query: str, 
-        mode: str, 
+        self,
+        query: str,
+        mode: str,
         local_model_id: str,
-        nvcf_model_id: str, 
+        nvcf_model_id: str,
         nim_model_ip: str,
-        nim_model_port: str, 
+        nim_model_port: str,
         nim_model_id: str,
         temp_slider: float,
         top_p_slider: float,
         freq_pen_slider: float,
         pres_pen_slider: float,
-        use_knowledge_base: bool, 
-        num_tokens: int
+        use_knowledge_base: bool,
+        num_tokens: int,
     ) -> typing.Generator[str, None, None]:
         """Make a model prediction."""
         data = {
@@ -80,7 +81,7 @@ class ChatClient:
             "local_model_id": local_model_id,
             "nvcf_model_id": nvcf_model_id,
             "nim_model_ip": nim_model_ip,
-            "nim_model_port": nim_model_port, 
+            "nim_model_port": nim_model_port,
             "nim_model_id": nim_model_id,
             "temp": temp_slider,
             "top_p": top_p_slider,
@@ -116,5 +117,9 @@ class ChatClient:
             )
 
             _ = requests.post(
-                url, headers=headers, files=files, verify=False, timeout=120  # type: ignore [arg-type]
+                url,
+                headers=headers,
+                files=files,
+                verify=False,
+                timeout=120,  # type: ignore [arg-type]
             )  # nosec # verify=false is intentional for now
