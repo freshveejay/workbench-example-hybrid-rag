@@ -8,5 +8,5 @@ langchain[llms]>=0.0.218
 chromadb==0.4.22
 sentence_transformers==2.7.0
 GitPython==3.1.58
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 text-generation==0.6.1
